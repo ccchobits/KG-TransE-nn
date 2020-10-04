@@ -4,7 +4,7 @@ import time
 class Writer:
     def __init__(self, configs):
         self.configs = configs
-        self.filtered_arguments = ["save_path", "seed", "dataset_path", "mode", "log"]
+        self.filtered_arguments = ["save_path", "seed", "dataset_path", "mode", "log", "gpu"]
         self.default_span = 10
         self.span = {"bern": 5, "bs": 5, "dataset": 5, "dim": 3, "epochs": 4, "init_lr": 4, "lr_decay": 3,
                      "margin": 3, "norm": 1, "model": 10}

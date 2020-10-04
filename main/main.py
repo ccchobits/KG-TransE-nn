@@ -33,7 +33,7 @@ parser.add_argument("--seed", type=int, default=12345)
 parser.add_argument("--dataset_path", type=str, default="../data/raw")
 parser.add_argument("--mode", type=str, default="train", help="[prepro | train | test | infer]")
 parser.add_argument("--log", type=bool_parser, default=True, help="logging or not")
-parser.add_argument("--model", type=str, default="SimplE", help="The model for training")
+parser.add_argument("--model", type=str, default="TransE_nn", help="The model for training")
 parser.add_argument("--gpu", type=str, default=0, help="The GPU to be used")
 parser.add_argument("--loss", type=str, default="margin", help="loss function")
 configs = parser.parse_args()
@@ -93,19 +93,20 @@ for epoch in range(1, epochs + 1):
 all_triplets = reader.get_all_triplets()
 
 
+# triplet: .type: torch.tensor .shape: (3,)
 def rank(triplet):
     # head.shape, tail.shape, rel.shape: (batch_size,)
     head, tail, rel = model.ent_embedding(triplet[0]), model.ent_embedding(triplet[1]), model.rel_embedding(triplet[2])
 
     # predict tail
-    new_triplet = triplet.clone()
+    new_triplet = triplet.clone().cpu().numpy().tolist()
     d = torch.norm(model.ent_embedding.weight.data - model.hidden_layer(torch.cat([head, rel])), p=norm, dim=1)
     sorted_d_indices = d.sort(descending=False).indices
     tail_raw_ranking = np.where(sorted_d_indices.cpu().numpy() == triplet[1].item())[0][0].tolist() + 1
     tail_filtered_ranking = tail_raw_ranking
     for i in range(tail_raw_ranking - 1):
         new_triplet[1] = sorted_d_indices[i].item()
-        if new_triplet in all_triplets:
+        if tuple(new_triplet) in all_triplets:
             tail_filtered_ranking -= 1
     return tail_raw_ranking, tail_filtered_ranking
 
@@ -114,7 +115,7 @@ def rank(triplet):
 def evaluate():
     ranks = []
     for triplet in reader.test_data:
-        ranks.append(rank(triplet.to(device)))
+        ranks.append(rank(torch.tensor(triplet).to(device)))
     ranks = np.array(ranks)
     mean_rank = ranks.mean(axis=0, dtype=np.long)
     hit10 = np.sum(ranks <= 10, axis=0) / len(ranks)

@@ -27,7 +27,7 @@ class Reader:
         - 1. .type: int
         - 2. .type: torch.tensor .shape: (n_triplet, 3) .location: cpu
         """
-        file_name = os.path.join("../data/raw", self.configs.dataset_name, mode + "2id.txt")
+        file_name = os.path.join("../data/raw", self.configs.dataset, mode + "2id.txt")
         with open(file_name) as file:
             lines = file.read().strip().split("\n")
             n_triplets = int(lines[0])
@@ -43,7 +43,7 @@ class Reader:
         :param target: [entity | relation]
         :return: int
         """
-        return int(open(os.path.join("../data/raw", self.configs.dataset_name, target + "2id.txt")).readline().strip())
+        return int(open(os.path.join("../data/raw", self.configs.dataset, target + "2id.txt")).readline().strip())
 
     def head_tail_ratio(self):
         """
@@ -94,14 +94,14 @@ class Reader:
         neg_samples = np.copy(pos_samples)
         for i in range(size):
             if head_or_tail[i] == 0:
-                neg_samples.data[i][0] = new_ent[i]
+                neg_samples[i][0] = new_ent[i]
             else:
-                neg_samples.data[i][1] = new_ent[i]
+                neg_samples[i][1] = new_ent[i]
         return neg_samples
 
     def get_all_triplets(self):
         all_triplets = set()
         for dataset in [self.train_data, self.valid_data, self.test_data]:
             for triplet in dataset:
-                all_triplets.add(triplet)
+                all_triplets.add(tuple(triplet.tolist()))
         return all_triplets
