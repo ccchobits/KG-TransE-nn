@@ -65,7 +65,7 @@ n_ent = reader.n_ent
 n_rel = reader.n_rel
 
 ### create model and optimizer
-model = TransE_nn(n_ent, n_rel, dim, margin, norm, [100], loss_funciton).to(device)
+model = TransE_nn(n_ent, n_rel, dim, margin, norm, hidden, loss_funciton).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 ### training the triplets in train_data
