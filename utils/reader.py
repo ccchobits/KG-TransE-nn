@@ -8,6 +8,8 @@ import pandas as pd
 class Reader:
     def __init__(self, configs):
         self.configs = configs
+        if configs.debug:
+            print("start loading train/validate/test data ...", flust=True)
         # train_data: .type: np.array, .shape: (n_train, 3)
         self.n_train, self.train_data = self.get_triplets("train")
         self.n_valid, self.valid_data = self.get_triplets("valid")
@@ -19,6 +21,9 @@ class Reader:
         # self.train_data_by_rel .type: list(np.array)
         self.train_data_by_rel = self.groupby_relation()
         self.shuffled_train_data = []
+        if configs.debug:
+            print("loaded n_train: %d, n_valid: %d, n_test: %d, n_ent: %d, n_rel: %d" % (
+                self.n_train, self.n_valid, self.n_test, self.n_ent, self.n_rel), flush=True)
 
     def get_triplets(self, mode="train"):
         """

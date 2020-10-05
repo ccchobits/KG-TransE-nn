@@ -22,7 +22,7 @@ parser.add_argument("--dataset_path", type=str, default="../data/raw")
 parser.add_argument("--save_path", type=str, default="./checkpoint")
 parser.add_argument("--dataset", type=str, default="WN18")
 parser.add_argument("--seed", type=int, default=12345)
-parser.add_argument("--mode", type=str, default="train", help="[prepro | train | test | infer]")
+parser.add_argument("--debug", type=bool_parser, default=False, help="debug mode")
 
 parser.add_argument("--gpu", type=str, default=0, help="The GPU to be used")
 parser.add_argument("--dim", type=int, default=64)
@@ -54,6 +54,11 @@ loss_funciton = configs.loss
 hidden = configs.hidden
 hidden = [int(h) for h in hidden]
 
+if configs.debug:
+    print(
+        "loaded parameters dataset_name: %s, bern: %s, epochs: %d, batch_size: %d, learning_rate: %f, dim: %d, margin: %f, lr_decay: %f, loss_function: %s, hidden: %s" %
+        (dataset_name, bern, epochs, batch_size, learning_rate, dim, margin, lr_decay, loss_funciton, hidden))
+
 device = torch.device("cuda")
 os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
@@ -66,7 +71,11 @@ n_ent = reader.n_ent
 n_rel = reader.n_rel
 
 ### create model and optimizer
+if configs.debug:
+    print("start building model...", flush=True)
 model = TransE_nn(n_ent, n_rel, dim, margin, norm, hidden, loss_funciton).to(device)
+print("built model: ", flush=True)
+print(model, flush=True)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 ### training the triplets in train_data

@@ -19,6 +19,7 @@ class TransE_nn(nn.Module):
         :param loss: .type [margin]
         """
         super(TransE_nn, self).__init__()
+
         self.margin = margin
         self.norm = norm
         self.depth = depth
@@ -30,9 +31,7 @@ class TransE_nn(nn.Module):
         self.rel_embedding.weight.data.uniform_(-6 / math.sqrt(depth), 6 / math.sqrt(depth))
         # self.ent_embedding.weight.data = F.normalize(self.ent_embedding.weight.data, dim=1)
         self.rel_embedding.weight.data = F.normalize(self.rel_embedding.weight.data, dim=1)
-
         self.hidden_layer = self.get_net()
-        print(self.hidden_layer, flush=True)
 
     def get_net(self):
         nets = list()
@@ -70,3 +69,5 @@ class TransE_nn(nn.Module):
                 return torch.max((self.margin + pos_score - neg_score), torch.tensor([0.]).to(device)).mean()
             return margin_loss
 
+    def get_regularization(self):
+        pass
