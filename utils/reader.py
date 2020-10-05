@@ -9,7 +9,7 @@ class Reader:
     def __init__(self, configs):
         self.configs = configs
         if configs.debug:
-            print("start loading train/validate/test data ...", flust=True)
+            print("start loading train/validate/test data ...", flush=True)
         # train_data: .type: np.array, .shape: (n_train, 3)
         self.n_train, self.train_data = self.get_triplets("train")
         self.n_valid, self.valid_data = self.get_triplets("valid")

@@ -24,7 +24,7 @@ parser.add_argument("--dataset", type=str, default="WN18")
 parser.add_argument("--seed", type=int, default=12345)
 parser.add_argument("--debug", type=bool_parser, default=False, help="debug mode")
 
-parser.add_argument("--gpu", type=str, default=0, help="The GPU to be used")
+parser.add_argument("--gpu", type=str, default="4", help="The GPU to be used")
 parser.add_argument("--dim", type=int, default=64)
 parser.add_argument("--epochs", type=int, default=120)
 parser.add_argument("--bs", type=int, default=2048, help="batch size")
@@ -60,6 +60,7 @@ if configs.debug:
         (dataset_name, bern, epochs, batch_size, learning_rate, dim, margin, lr_decay, loss_funciton, hidden))
 
 device = torch.device("cuda")
+print("GPU id:", gpu)
 os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
 reader = Reader(configs)
