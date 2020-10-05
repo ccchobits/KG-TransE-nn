@@ -52,6 +52,7 @@ norm = configs.norm
 gpu = configs.gpu
 loss_funciton = configs.loss
 hidden = configs.hidden
+hidden = [int(h) for h in hidden]
 
 device = torch.device("cuda")
 os.environ["CUDA_VISIBLE_DEVICES"] = gpu

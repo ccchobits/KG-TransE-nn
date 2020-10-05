@@ -1,0 +1,4 @@
+2020-10-05 01:06:07|model:TransE_nn |bern:True |bs:4096 |dataset:WN18 |dim:64 |epochs:300 |init_lr:0.01|loss:margin    |lr_decay:1.4|margin:20.0|norm:1|
+                        mean rank  hit10
+tail: raw ranking            5734  6.36%
+tail: filtered ranking       5723  6.42%
