@@ -7,7 +7,7 @@ class Writer:
         self.filtered_arguments = ["save_path", "seed", "dataset_path", "mode", "log", "gpu"]
         self.default_span = 10
         self.span = {"bern": 5, "bs": 5, "dataset": 5, "dim": 3, "epochs": 4, "init_lr": 4, "lr_decay": 3,
-                     "margin": 3, "norm": 1, "model": 10}
+                     "margin": 3, "norm": 1, "model": 10, "loss": 6}
         self.head = ["model"]
         self.order = self.get_order()
         self.path = "../scripts/asset/performance.result"

@@ -9,9 +9,20 @@ device = torch.device("cuda")
 
 class TransE_nn(nn.Module):
     def __init__(self, n_ent, n_rel, depth, margin, norm, hidden, loss):
+        """
+        :param n_ent: .type: int
+        :param n_rel: .type: int
+        :param depth: .type: int
+        :param margin: .type: float
+        :param norm: .type: [1 | 2]
+        :param hidden: .type: list
+        :param loss: .type [margin]
+        """
         super(TransE_nn, self).__init__()
         self.margin = margin
         self.norm = norm
+        self.depth = depth
+        self.hidden = hidden
         self.loss = self.get_loss_function(loss)
         self.ent_embedding = nn.Embedding(n_ent, depth)
         self.rel_embedding = nn.Embedding(n_rel, depth)
@@ -20,11 +31,18 @@ class TransE_nn(nn.Module):
         # self.ent_embedding.weight.data = F.normalize(self.ent_embedding.weight.data, dim=1)
         self.rel_embedding.weight.data = F.normalize(self.rel_embedding.weight.data, dim=1)
 
-        self.hidden_layer = nn.Sequential(
-            torch.nn.Linear(2 * depth, hidden),
-            torch.nn.ReLU(),
-            torch.nn.Linear(hidden, depth),
-        )
+        self.hidden_layer = self.get_net()
+        print(self.hidden_layer, flush=True)
+
+    def get_net(self):
+        nets = list()
+        nets.append(nn.Linear(2 * self.depth, self.hidden[0]))
+        nets.append(nn.ReLU(True))
+        for i in range(len(self.hidden) - 1):
+            nets.append(nn.Linear(self.hidden[i], self.hidden[i+1]))
+            nets.append(nn.ReLU(True))
+        nets.append(nn.Linear(self.hidden[-1], self.depth))
+        return nn.Sequential(*nets)
 
     def get_score(self, heads, tails, rels):
         # shape: (batch_size, depth)
@@ -37,7 +55,7 @@ class TransE_nn(nn.Module):
         return torch.norm(hidden_layer_output - tails, p=self.norm, dim=1)
 
     def forward(self, pos_x, neg_x):
-        #self.ent_embedding.weight.data = F.normalize(self.ent_embedding.weight.data, dim=1)
+        # self.ent_embedding.weight.data = F.normalize(self.ent_embedding.weight.data, dim=1)
         # self.rel_embedding.weight.data = F.normalize(self.rel_embedding.weight.data, dim=1)
         # shape: (batch_size,)
         pos_heads, pos_tails, pos_rels = pos_x[:, 0], pos_x[:, 1], pos_x[:, 2]

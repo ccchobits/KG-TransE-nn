@@ -18,8 +18,13 @@ def bool_parser(s):
 
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--dataset_path", type=str, default="../data/raw")
 parser.add_argument("--save_path", type=str, default="./checkpoint")
 parser.add_argument("--dataset", type=str, default="WN18")
+parser.add_argument("--seed", type=int, default=12345)
+parser.add_argument("--mode", type=str, default="train", help="[prepro | train | test | infer]")
+
+parser.add_argument("--gpu", type=str, default=0, help="The GPU to be used")
 parser.add_argument("--dim", type=int, default=64)
 parser.add_argument("--epochs", type=int, default=120)
 parser.add_argument("--bs", type=int, default=2048, help="batch size")
@@ -29,13 +34,10 @@ parser.add_argument("--bern", type=bool_parser, default=False,
                     help="The strategy for sampling corrupt triplets. bern: bernoulli distribution.")
 parser.add_argument("--margin", type=float, default=1.0)
 parser.add_argument("--norm", type=int, default=2, help="[1 | 2]")
-parser.add_argument("--seed", type=int, default=12345)
-parser.add_argument("--dataset_path", type=str, default="../data/raw")
-parser.add_argument("--mode", type=str, default="train", help="[prepro | train | test | infer]")
 parser.add_argument("--log", type=bool_parser, default=True, help="logging or not")
 parser.add_argument("--model", type=str, default="TransE_nn", help="The model for training")
-parser.add_argument("--gpu", type=str, default=0, help="The GPU to be used")
 parser.add_argument("--loss", type=str, default="margin", help="loss function")
+parser.add_argument("--hidden", nargs="+", default=[100], help="hidden layer")
 configs = parser.parse_args()
 
 dataset_name = configs.dataset
@@ -49,6 +51,7 @@ lr_decay = configs.lr_decay
 norm = configs.norm
 gpu = configs.gpu
 loss_funciton = configs.loss
+hidden = configs.hidden
 
 device = torch.device("cuda")
 os.environ["CUDA_VISIBLE_DEVICES"] = gpu
@@ -62,7 +65,7 @@ n_ent = reader.n_ent
 n_rel = reader.n_rel
 
 ### create model and optimizer
-model = TransE_nn(n_ent, n_rel, dim, margin, norm, 100, loss_funciton).to(device)
+model = TransE_nn(n_ent, n_rel, dim, margin, norm, [100], loss_funciton).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 ### training the triplets in train_data
