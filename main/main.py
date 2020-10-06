@@ -50,14 +50,14 @@ margin = configs.margin
 lr_decay = configs.lr_decay
 norm = configs.norm
 gpu = configs.gpu
-loss_funciton = configs.loss
+loss_function = configs.loss
 hidden = configs.hidden
 hidden = [int(h) for h in hidden]
 
 if configs.debug:
     print(
         "loaded parameters dataset_name: %s, bern: %s, epochs: %d, batch_size: %d, learning_rate: %f, dim: %d, margin: %f, lr_decay: %f, loss_function: %s, hidden: %s" %
-        (dataset_name, bern, epochs, batch_size, learning_rate, dim, margin, lr_decay, loss_funciton, hidden))
+        (dataset_name, bern, epochs, batch_size, learning_rate, dim, margin, lr_decay, loss_function, hidden))
 
 device = torch.device("cuda")
 print("GPU id:", gpu)
@@ -74,7 +74,7 @@ n_rel = reader.n_rel
 ### create model and optimizer
 if configs.debug:
     print("start building model...", flush=True)
-model = TransE_nn(n_ent, n_rel, dim, margin, norm, hidden, loss_funciton).to(device)
+model = TransE_nn(n_ent, n_rel, dim, margin, norm, hidden, loss_function).to(device)
 print("built model: ", flush=True)
 print(model, flush=True)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)

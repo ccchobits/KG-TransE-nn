@@ -21,6 +21,7 @@ class Reader:
         # self.train_data_by_rel .type: list(np.array)
         self.train_data_by_rel = self.groupby_relation()
         self.shuffled_train_data = []
+        self.indices = np.arange(self.n_train)
         if configs.debug:
             print("loaded n_train: %d, n_valid: %d, n_test: %d, n_ent: %d, n_rel: %d" % (
                 self.n_train, self.n_valid, self.n_test, self.n_ent, self.n_rel), flush=True)
@@ -72,14 +73,22 @@ class Reader:
             train_data_by_rel.append(train_data_pd[train_data_pd["relation"] == i].to_numpy())
         return train_data_by_rel
 
-    def shuffle(self):
-        random.shuffle(self.train_data_by_rel)
-        for block in self.train_data_by_rel:
-            np.random.shuffle(block)
-        self.shuffled_train_data = np.concatenate(self.train_data_by_rel, axis=0)
+    # def shuffle(self):
+    #     random.shuffle(self.train_data_by_rel)
+    #     for block in self.train_data_by_rel:
+    #         np.random.shuffle(block)
+    #     self.shuffled_train_data = np.concatenate(self.train_data_by_rel, axis=0)
+
+    def shuffule(self):
+        np.random.permutation(self.indices)
+
+    # def next_batch(self, start, end):
+    #     pos_samples = self.shuffled_train_data[start: end]
+    #     neg_samples = self.get_neg_samples(pos_samples)
+    #     return pos_samples, neg_samples
 
     def next_batch(self, start, end):
-        pos_samples = self.shuffled_train_data[start: end]
+        pos_samples = self.train_data[self.indices[start: end]]
         neg_samples = self.get_neg_samples(pos_samples)
         return pos_samples, neg_samples
 

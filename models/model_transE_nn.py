@@ -24,7 +24,7 @@ class TransE_nn(nn.Module):
         self.norm = norm
         self.depth = depth
         self.hidden = hidden
-        self.loss = self.get_loss_function(loss)
+        self.loss_function = self.get_loss_function(loss)
         self.ent_embedding = nn.Embedding(n_ent, depth)
         self.rel_embedding = nn.Embedding(n_rel, depth)
         self.ent_embedding.weight.data.uniform_(-6 / math.sqrt(depth), 6 / math.sqrt(depth))
@@ -61,13 +61,17 @@ class TransE_nn(nn.Module):
         neg_heads, neg_tails, neg_rels = neg_x[:, 0], neg_x[:, 1], neg_x[:, 2]
         pos_score = self.get_score(pos_heads, pos_tails, pos_rels)
         neg_score = self.get_score(neg_heads, neg_tails, neg_rels)
-        return torch.max((self.margin + pos_score - neg_score), torch.tensor([0.]).to(device)).mean()
+        return self.loss_function(pos_score, neg_score)
 
     def get_loss_function(self, mode="margin"):
         if mode == "margin":
             def margin_loss(pos_score, neg_score):
                 return torch.max((self.margin + pos_score - neg_score), torch.tensor([0.]).to(device)).mean()
             return margin_loss
+        elif mode == "softplus":
+            def softplus_loss(pos_score, neg_score):
+                return (torch.log(1 + torch.exp(-1 * pos_score)) + torch.log(1 + torch.exp(neg_score))).mean()
+            return softplus_loss
 
     def get_regularization(self):
         pass
