@@ -79,7 +79,7 @@ class Reader:
     #         np.random.shuffle(block)
     #     self.shuffled_train_data = np.concatenate(self.train_data_by_rel, axis=0)
 
-    def shuffule(self):
+    def shuffle(self):
         np.random.permutation(self.indices)
 
     # def next_batch(self, start, end):
